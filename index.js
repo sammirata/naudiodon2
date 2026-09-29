@@ -13,11 +13,13 @@
   limitations under the License.
 */
 
+const path = require('path');
 const { Readable, Writable, Duplex } = require('stream');
-const portAudioBindings = require("bindings")("naudiodon.node");
-
-var SegfaultHandler = require('segfault-handler');
-SegfaultHandler.registerHandler("crash.log");
+// Direct path load: this is the location node-gyp's binding.gyp writes to, which is
+// all the `bindings` package ever resolved to here. Dropping `bindings` (and the
+// segfault handler that used to register a crash.log writer into every consumer's
+// process) makes this package dependency-free.
+const portAudioBindings = require(path.join(__dirname, 'build', 'Release', 'naudiodon.node'));
 
 exports.SampleFormatFloat32 = 1;
 exports.SampleFormat8Bit = 8;

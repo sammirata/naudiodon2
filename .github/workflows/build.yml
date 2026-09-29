@@ -1,0 +1,45 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  native:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: win32-x64, os: windows-latest, platform: win32, arch: x64, palib: portaudio_x64.dll }
+          - { name: darwin-arm64, os: macos-14, platform: darwin, arch: arm64, palib: libportaudio.dylib }
+          - { name: darwin-x64, os: macos-13, platform: darwin, arch: x64, palib: libportaudio.dylib }
+          - { name: linux-x64, os: ubuntu-latest, platform: linux, arch: x64, palib: libportaudio.so.2 }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: Stage the platform payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/pkg
+          cp build/Release/naudiodon.node "dist/pkg/naudiodon2-${{ matrix.platform }}-${{ matrix.arch }}.node"
+          cp "build/Release/${{ matrix.palib }}" "dist/pkg/${{ matrix.palib }}"
+          cd dist/pkg
+          zip -9 "../naudiodon2-${{ matrix.platform }}-${{ matrix.arch }}.zip" *
+      - uses: actions/upload-artifact@v4
+        with:
+          name: naudiodon2-${{ matrix.platform }}-${{ matrix.arch }}
+          path: dist/naudiodon2-${{ matrix.platform }}-${{ matrix.arch }}.zip
+          retention-days: 30
+      - name: Attach to the tag's release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/naudiodon2-${{ matrix.platform }}-${{ matrix.arch }}.zip
