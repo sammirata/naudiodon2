@@ -1,5 +1,12 @@
 # Naudiodon
 
+> **SipRadius fork** (github.com/sammirata/naudiodon2, mirrored at code.ammshield.com
+> `gitadmin/naudiodon2`), vendored by agent-ide for native Talk audio. Differences from upstream:
+> no runtime dependencies (`bindings` and `segfault-handler` removed; `index.js` loads the `.node`
+> by path); CI builds win32-x64, darwin-arm64, darwin-x64 and linux-x64 onto each `v*` tag's
+> release; the PortAudio libraries in `portaudio/bin/` are built by our own CI from upstream
+> PortAudio v19.7.0 (see `portaudio/PROVENANCE.md`); 32-bit ARM Linux is not built.
+
 A [Node.js](http://nodejs.org/) [addon](http://nodejs.org/api/addons.html) that provides a wrapper around the [PortAudio](http://portaudio.com/) library, enabling an application to record and play audio with cross platform support. With this library, you can create [node.js streams](https://nodejs.org/dist/latest-v6.x/docs/api/stream.html) that can be piped to or from other streams, such as files and network connections. This library supports back-pressure.
 
 This is a fork of [node-portaudio](/joeferner/node-portaudio), refactored by:
