@@ -35,7 +35,12 @@ jobs:
           cp build/Release/naudiodon.node "dist/pkg/naudiodon2-${{ matrix.platform }}-${{ matrix.arch }}.node"
           cp "build/Release/${{ matrix.palib }}" "dist/pkg/${{ matrix.palib }}"
           cd dist/pkg
-          zip -9 "../naudiodon2-${{ matrix.platform }}-${{ matrix.arch }}.zip" *
+          if command -v zip >/dev/null 2>&1; then
+            zip -9 "../naudiodon2-${{ matrix.platform }}-${{ matrix.arch }}.zip" *
+          else
+            # windows runners ship no zip(1) in Git Bash; 7-Zip is preinstalled
+            7z a -mx=9 "../naudiodon2-${{ matrix.platform }}-${{ matrix.arch }}.zip" ./*
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: naudiodon2-${{ matrix.platform }}-${{ matrix.arch }}
